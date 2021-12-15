@@ -70,11 +70,12 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(close) {
     [extensionContext completeRequestReturningItems:nil
                                   completionHandler:nil];
-// Set the view to nil so it gets cleaned up.
+    // Set the view to nil so it gets cleaned up.
     self.view = nil;
 
     [sharedBridge invalidate];
     sharedBridge = nil;
+    exit(0);
 }
 
 
