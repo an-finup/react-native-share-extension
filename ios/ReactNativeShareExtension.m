@@ -40,15 +40,12 @@ RCT_EXPORT_MODULE();
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    NSURL *jsCodeLocation;
     //object variable for extension doesn't work for react-native. It must be assign to gloabl
     //variable extensionContext. in this way, both exported method can touch extensionContext
     extensionContext = self.extensionContext;
 
     if (sharedBridge == nil) {
         
-        jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-
         sharedBridge = [[RCTBridge alloc] initWithBundleURL:jsCodeLocation
                                              moduleProvider:nil
                                               launchOptions:nil];
