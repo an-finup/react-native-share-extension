@@ -10,6 +10,7 @@
 NSExtensionContext* extensionContext;
 
 RCTBridge *sharedBridge;
+NSURL *jsCodeLocation;
 
 @implementation ReactNativeShareExtension {
     NSTimer *autoTimer;
@@ -45,7 +46,8 @@ RCT_EXPORT_MODULE();
     extensionContext = self.extensionContext;
 
     if (sharedBridge == nil) {
-        
+
+        jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
         sharedBridge = [[RCTBridge alloc] initWithBundleURL:jsCodeLocation
                                              moduleProvider:nil
                                               launchOptions:nil];
