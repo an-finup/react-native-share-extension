@@ -1,5 +1,6 @@
 #import "ReactNativeShareExtension.h"
 #import "React/RCTRootView.h"
+#import "React/RCTBundleURLProvider.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 
 #define URL_IDENTIFIER @"public.url"
@@ -44,6 +45,10 @@ RCT_EXPORT_MODULE();
     extensionContext = self.extensionContext;
 
     if (sharedBridge == nil) {
+        
+        NSURL *jsCodeLocation;
+        jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+
         sharedBridge = [[RCTBridge alloc] initWithBundleURL:jsCodeLocation
                                              moduleProvider:nil
                                               launchOptions:nil];
