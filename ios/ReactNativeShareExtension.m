@@ -159,10 +159,11 @@ RCT_REMAP_METHOD(data,
                     sharedImage = [UIImage imageWithData:data];
                 }
 
-                [UIImagePNGRepresentation(sharedImage) writeToFile:fullPath atomically:YES];
+                NSString *fullPathFF = [NSString stringWithFormat:@"file://%@", fullPath];
+                [UIImagePNGRepresentation(sharedImage) writeToFile:fullPathFF atomically:YES];
 
                 if(callback) {
-                    callback(fullPath, [fullPath pathExtension], nil);
+                    callback(fullPathFF, [fullPath pathExtension], nil);
                 }
             }];
         } else if (textProvider) {
