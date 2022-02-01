@@ -137,6 +137,31 @@ RCT_REMAP_METHOD(data,
         } else if (imageProvider) {
             [imageProvider loadItemForTypeIdentifier:IMAGE_IDENTIFIER options:nil completionHandler:^(id<NSSecureCoding> item, NSError *error) {
 
+                if ([(NSObject *)item isKindOfClass:[UIImage class]]){
+
+                    UIImage *sharedImage;
+                    sharedImage = (UIImage *)item;
+                    NSData *imageData = UIImagePNGRepresentation(sharedImage);
+                    NSString *base64String = [imageData base64EncodedStringWithOptions:0];
+                    if(callback) {
+                        callback(base64String, @"base64/art", nil);
+                    }
+
+                } else if ([(NSObject *)item isKindOfClass:[NSURL class]]){
+                    NSURL* url = (NSURL *)item;
+                    if(callback) {
+                        callback([url absoluteString], [[[url absoluteString] pathExtension] lowercaseString], nil);
+                    }
+                } else {
+                    if(callback) {
+                        callback(nil, nil, nil);
+                    }
+                }
+
+            }];
+        } else if (imageProvider) {
+            [imageProvider loadItemForTypeIdentifier:IMAGE_IDENTIFIER options:nil completionHandler:^(id<NSSecureCoding> item, NSError *error) {
+
                 /**
                  * Save the image to NSTemporaryDirectory(), which cleans itself tri-daily.
                  * This is necessary as the iOS 11 screenshot editor gives us a UIImage, while
