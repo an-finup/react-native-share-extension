@@ -89,7 +89,7 @@ RCT_EXPORT_METHOD(openURL:(NSString *)url) {
   NSURL *updatesDirectory = [applicationDocumentsDirectory URLByAppendingPathComponent:@".expo-internal"];
 
   static NSString * const EXUpdatesDatabaseLatestFilename = @"expo-v6.db";
-  sqlite3 *db;
+  //sqlite3 *db;
   NSURL *dbUrl = [updatesDirectory URLByAppendingPathComponent:EXUpdatesDatabaseLatestFilename];
 
   NSLog(@"HELLO HELLO HELLO: %s", [[dbUrl path] UTF8String]);
