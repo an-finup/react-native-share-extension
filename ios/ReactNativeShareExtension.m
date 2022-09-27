@@ -53,7 +53,7 @@ RCT_EXPORT_MODULE();
         NSPredicate *bPredicate = [NSPredicate predicateWithFormat:@"SELF ENDSWITH[c] 'bundle'"];
         NSString *filename = [[[fileManager contentsOfDirectoryAtPath:updatesDirectory.path error:&losterror] filteredArrayUsingPredicate:bPredicate] lastObject];
         if( filename ){
-            jsCodeLocation = [updatesDirectory URLByAppendingPathComponent:filename]
+            jsCodeLocation = [updatesDirectory URLByAppendingPathComponent:filename];
         } else {
             jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
         }
