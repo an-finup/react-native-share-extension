@@ -46,11 +46,20 @@ RCT_EXPORT_MODULE();
     extensionContext = self.extensionContext;
 
     if (sharedBridge == nil) {
-
-        jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+        NSFileManager *fileManager = NSFileManager.defaultManager;
+        NSURL *applicationDocumentsDirectory = [[fileManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
+        NSURL *updatesDirectory = [applicationDocumentsDirectory URLByAppendingPathComponent:@".expo-internal"];
+        NSError *losterror;
+        NSPredicate *bPredicate = [NSPredicate predicateWithFormat:@"SELF ENDSWITH[c] 'bundle'"];
+        NSString *filename = [[[fileManager contentsOfDirectoryAtPath:updatesDirectory.path error:&losterror] filteredArrayUsingPredicate:bPredicate] lastObject];
+        if( filename ){
+            jsCodeLocation = [updatesDirectory URLByAppendingPathComponent:filename]
+        } else {
+            jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+        }
         sharedBridge = [[RCTBridge alloc] initWithBundleURL:jsCodeLocation
-                                             moduleProvider:nil
-                                              launchOptions:nil];
+                                                moduleProvider:nil
+                                                launchOptions:nil];
     }
 
     UIView *rootView = [self shareViewWithRCTBridge:sharedBridge];
@@ -81,19 +90,17 @@ RCT_EXPORT_METHOD(close) {
 
 
 RCT_EXPORT_METHOD(openURL:(NSString *)url) {
-  // UIApplication *application = [UIApplication sharedApplication];
-  // NSURL *urlToOpen = [NSURL URLWithString:[url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-  // [application openURL:urlToOpen options:@{} completionHandler: nil];
-  NSFileManager *fileManager = NSFileManager.defaultManager;
-  NSURL *applicationDocumentsDirectory = [[fileManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
-  NSURL *updatesDirectory = [applicationDocumentsDirectory URLByAppendingPathComponent:@".expo-internal"];
-
-  static NSString * const EXUpdatesDatabaseLatestFilename = @"expo-v6.db";
-  //sqlite3 *db;
-  NSURL *dbUrl = [updatesDirectory URLByAppendingPathComponent:EXUpdatesDatabaseLatestFilename];
-
-  NSLog(@"HELLO HELLO HELLO: %s", [[dbUrl path] UTF8String]);
-  //int resultCode = sqlite3_open([[dbUrl path] UTF8String], &db);
+  UIApplication *application = [UIApplication sharedApplication];
+  NSURL *urlToOpen = [NSURL URLWithString:[url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+  [application openURL:urlToOpen options:@{} completionHandler: nil];
+  //NSFileManager *fileManager = NSFileManager.defaultManager;
+  //NSURL *applicationDocumentsDirectory = [[fileManager URLsForDirectory:NSApplicationSupportDirectory //inDomains:NSUserDomainMask] lastObject];
+  //NSURL *updatesDirectory = [applicationDocumentsDirectory URLByAppendingPathComponent:@".expo-internal"];
+  //static NSString * const EXUpdatesDatabaseLatestFilename = @"expo-v6.db";
+  ////sqlite3 *db;
+  //NSURL *dbUrl = [updatesDirectory URLByAppendingPathComponent:EXUpdatesDatabaseLatestFilename];
+  //NSLog(@"HELLO HELLO HELLO: %s", [[dbUrl path] UTF8String]);
+  ////int resultCode = sqlite3_open([[dbUrl path] UTF8String], &db);
 }
 
 
