@@ -41,7 +41,7 @@ RCT_EXPORT_MODULE();
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    //object variable for extension doesn't work for react-native. It must be assign to gloabl
+    //object variable for extension doesn't work for react-native. It must be assign to global
     //variable extensionContext. in this way, both exported method can touch extensionContext
     extensionContext = self.extensionContext;
 
@@ -81,9 +81,19 @@ RCT_EXPORT_METHOD(close) {
 
 
 RCT_EXPORT_METHOD(openURL:(NSString *)url) {
-  UIApplication *application = [UIApplication sharedApplication];
-  NSURL *urlToOpen = [NSURL URLWithString:[url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-  [application openURL:urlToOpen options:@{} completionHandler: nil];
+  // UIApplication *application = [UIApplication sharedApplication];
+  // NSURL *urlToOpen = [NSURL URLWithString:[url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+  // [application openURL:urlToOpen options:@{} completionHandler: nil];
+  NSFileManager *fileManager = NSFileManager.defaultManager;
+  NSURL *applicationDocumentsDirectory = [[fileManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
+  NSURL *updatesDirectory = [applicationDocumentsDirectory URLByAppendingPathComponent:@".expo-internal"];
+
+  static NSString * const EXUpdatesDatabaseLatestFilename = @"expo-v6.db";
+  sqlite3 *db;
+  NSURL *dbUrl = [updatesDirectory URLByAppendingPathComponent:EXUpdatesDatabaseLatestFilename];
+
+  NSLog(@"HELLO HELLO HELLO: %s", [[dbUrl path] UTF8String]);
+  //int resultCode = sqlite3_open([[dbUrl path] UTF8String], &db);
 }
 
 
