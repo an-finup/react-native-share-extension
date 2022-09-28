@@ -105,8 +105,8 @@ RCT_EXPORT_METHOD(openURL:(NSString *)url) {
 
 
 RCT_REMAP_METHOD(syncUpdates,
-                 resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
+                 resolver1:(RCTPromiseResolveBlock)resolve
+                 rejecter1:(RCTPromiseRejectBlock)reject)
 {
     NSFileManager *fileManager = NSFileManager.defaultManager;
     NSURL *applicationDocumentsDirectory = [[fileManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
@@ -127,8 +127,8 @@ RCT_REMAP_METHOD(syncUpdates,
 
 
 RCT_REMAP_METHOD(data,
-                 resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
+                 resolver2:(RCTPromiseResolveBlock)resolve
+                 rejecter2:(RCTPromiseRejectBlock)reject)
 {
     [self extractDataFromContext: extensionContext withCallback:^(NSString* val, NSString* contentType, NSException* err) {
         if(err) {
