@@ -104,6 +104,27 @@ RCT_EXPORT_METHOD(openURL:(NSString *)url) {
 }
 
 
+RCT_REMAP_METHOD(syncUpdates,
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSFileManager *fileManager = NSFileManager.defaultManager;
+    NSURL *applicationDocumentsDirectory = [[fileManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
+    NSURL *updatesDirectory = [applicationDocumentsDirectory URLByAppendingPathComponent:@".expo-internal"];
+    NSURL *destinationDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.org.name.finupwhite"] URLByAppendingPathComponent:@".expo-internal"];
+
+    NSError *copyError = nil;
+    if (![fileManager copyItemAtPath:updatesDirectory.path toPath:destinationDirectory.path error:&copyError]) {
+        reject(@"error", @"Could not copy files", nil);
+    } else {
+        resolve(@{
+            @"path": destinationDirectory.path,
+            @"value": @"success"
+            });
+    }
+}
+
+
 
 RCT_REMAP_METHOD(data,
                  resolver:(RCTPromiseResolveBlock)resolve
