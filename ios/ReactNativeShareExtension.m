@@ -47,8 +47,7 @@ RCT_EXPORT_MODULE();
 
     if (sharedBridge == nil) {
         NSFileManager *fileManager = NSFileManager.defaultManager;
-        NSURL *applicationDocumentsDirectory = [[fileManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
-        NSURL *updatesDirectory = [applicationDocumentsDirectory URLByAppendingPathComponent:@".expo-internal"];
+        NSURL *updatesDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.org.name.finupwhite"] URLByAppendingPathComponent:@".expo-internal"];
         NSError *losterror;
         NSPredicate *bPredicate = [NSPredicate predicateWithFormat:@"SELF ENDSWITH[c] 'bundle'"];
         NSString *filename = [[[fileManager contentsOfDirectoryAtPath:updatesDirectory.path error:&losterror] filteredArrayUsingPredicate:bPredicate] lastObject];
@@ -112,9 +111,9 @@ RCT_REMAP_METHOD(syncUpdates,
     NSURL *applicationDocumentsDirectory = [[fileManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
     NSURL *updatesDirectory = [applicationDocumentsDirectory URLByAppendingPathComponent:@".expo-internal"];
     NSURL *destinationDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.org.name.finupwhite"] URLByAppendingPathComponent:@".expo-internal"];
-
-    NSError *copyError = nil;
-    if (![fileManager copyItemAtPath:updatesDirectory.path toPath:destinationDirectory.path error:&copyError]) {
+    NSError *operationError = nil;
+    [fileManager removeItemAtPath:destinationDirectory.path error:&operationError];
+    if (![fileManager copyItemAtPath:updatesDirectory.path toPath:destinationDirectory.path error:&operationError]) {
         reject(@"error", @"Could not copy files", nil);
     } else {
         resolve(@{
