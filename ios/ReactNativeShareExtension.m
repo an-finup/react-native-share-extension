@@ -113,7 +113,7 @@ RCT_REMAP_METHOD(syncUpdates,
 
     // figure out the most recent bundle
     NSArray *updatesDirectoryContent = [fileManager contentsOfDirectoryAtURL:updatesDirectory includingPropertiesForKeys:@[NSURLContentModificationDateKey] options:NSDirectoryEnumerationSkipsHiddenFiles error:nil];
-    NSURL *sortedMostRecent = [[updatesDirectoryContent sortedArrayUsingComparator:
+    NSArray *sortedMostRecentAll = [updatesDirectoryContent sortedArrayUsingComparator:
                         ^(NSURL *file1, NSURL *file2)
                         {
                             // compare
@@ -125,7 +125,15 @@ RCT_REMAP_METHOD(syncUpdates,
 
                             // Ascending:
                             return [file1Date compare: file2Date];
-                        }] lastObject];
+                        }];
+
+    NSMutableArray *Sf1 = [NSMutableArray arrayWithCapacity:[sortedMostRecentAll count]];
+    [sortedMostRecentAll enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        [Sf1 addObject:[obj lastPathComponent]];
+    }];
+    NSArray *Sf2 = [Sf1 copy];
+    NSPredicate *bPredicate = [NSPredicate predicateWithFormat:@"SELF ENDSWITH[c] '.bundle'"];
+    NSString *sortedMostRecent = [[Sf2 filteredArrayUsingPredicate:bPredicate] lastObject];
 
     NSURL *destinationDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.org.name.finupwhite"] URLByAppendingPathComponent:@".expo-internal"];
     if (![fileManager removeItemAtPath:destinationDirectory.path error:nil]) {
@@ -136,7 +144,7 @@ RCT_REMAP_METHOD(syncUpdates,
         } else {
 
             // rename the latest bundle at the destination
-            NSString *filename = [sortedMostRecent lastPathComponent];
+            NSString *filename = sortedMostRecent;
             NSURL *targFile = [destinationDirectory URLByAppendingPathComponent:filename];
             NSURL *destFile = [destinationDirectory URLByAppendingPathComponent:@"mostrecent.bundle"];
             if (![fileManager moveItemAtPath:targFile.path toPath:destFile.path error:nil]) {
