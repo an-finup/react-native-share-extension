@@ -49,7 +49,7 @@ RCT_EXPORT_MODULE();
         NSFileManager *fileManager = NSFileManager.defaultManager;
         NSURL *updatesDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.org.name.finupwhite"] URLByAppendingPathComponent:@".expo-internal"];
         NSError *losterror;
-        NSPredicate *bPredicate = [NSPredicate predicateWithFormat:@"SELF ENDSWITH[c] 'bundle'"];
+        NSPredicate *bPredicate = [NSPredicate predicateWithFormat:@"SELF ENDSWITH[c] 'mostrecent.bundle'"];
         NSString *filename = [[[fileManager contentsOfDirectoryAtPath:updatesDirectory.path error:&losterror] filteredArrayUsingPredicate:bPredicate] lastObject];
         if( filename ){
             jsCodeLocation = [updatesDirectory URLByAppendingPathComponent:filename];
@@ -110,16 +110,44 @@ RCT_REMAP_METHOD(syncUpdates,
     NSFileManager *fileManager = NSFileManager.defaultManager;
     NSURL *applicationDocumentsDirectory = [[fileManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
     NSURL *updatesDirectory = [applicationDocumentsDirectory URLByAppendingPathComponent:@".expo-internal"];
+
+    // figure out the most recent bundle
+    NSArray *updatesDirectoryContent = [fileManager contentsOfDirectoryAtURL:updatesDirectory includingPropertiesForKeys:@[NSURLContentModificationDateKey] error:nil];
+    NSURL *sortedMostRecent = [[updatesDirectoryContent sortedArrayUsingComparator:
+                        ^(NSURL *file1, NSURL *file2)
+                        {
+                            // compare
+                            NSDate *file1Date;
+                            [file1 getResourceValue:&file1Date forKey:NSURLContentModificationDateKey error:nil];
+
+                            NSDate *file2Date;
+                            [file2 getResourceValue:&file2Date forKey:NSURLContentModificationDateKey error:nil];
+
+                            // Ascending:
+                            return [file1Date compare: file2Date];
+                        }] lastObject];
+
     NSURL *destinationDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.org.name.finupwhite"] URLByAppendingPathComponent:@".expo-internal"];
-    NSError *operationError = nil;
-    [fileManager removeItemAtPath:destinationDirectory.path error:&operationError];
-    if (![fileManager copyItemAtPath:updatesDirectory.path toPath:destinationDirectory.path error:&operationError]) {
-        reject(@"error", @"Could not copy files", nil);
+    if (![fileManager removeItemAtPath:destinationDirectory.path error:nil]) {
+        reject(@"error", @"Could not delete old folder", nil);
     } else {
-        resolve(@{
-            @"path": destinationDirectory.path,
-            @"value": @"success"
-            });
+        if (![fileManager copyItemAtPath:updatesDirectory.path toPath:destinationDirectory.path error:nil]) {
+            reject(@"error", @"Could not copy files", nil);
+        } else {
+
+            // rename the latest bundle at the destination
+            NSString *filename = [sortedMostRecent lastPathComponent];
+            NSURL *targFile = [destinationDirectory URLByAppendingPathComponent:filename];
+            NSURL *destFile = [destinationDirectory URLByAppendingPathComponent:@"mostrecent.bundle"];
+            if (![fileManager moveItemAtPath:targFile.path toPath:destFile.path error:nil]) {
+                reject(@"error", @"Could not rename the most recent bundle", nil);
+            } else {
+                resolve(@{
+                    @"path": destFile.path,
+                    @"value": @"success"
+                    });
+            }
+        }
     }
 }
 
