@@ -112,7 +112,7 @@ RCT_REMAP_METHOD(syncUpdates,
     NSURL *updatesDirectory = [applicationDocumentsDirectory URLByAppendingPathComponent:@".expo-internal"];
 
     // figure out the most recent bundle
-    NSArray *updatesDirectoryContent = [fileManager contentsOfDirectoryAtURL:updatesDirectory includingPropertiesForKeys:@[NSURLContentModificationDateKey] error:nil];
+    NSArray *updatesDirectoryContent = [fileManager contentsOfDirectoryAtURL:updatesDirectory includingPropertiesForKeys:@[NSURLContentModificationDateKey] options:NSDirectoryEnumerationSkipsHiddenFiles error:nil];
     NSURL *sortedMostRecent = [[updatesDirectoryContent sortedArrayUsingComparator:
                         ^(NSURL *file1, NSURL *file2)
                         {
