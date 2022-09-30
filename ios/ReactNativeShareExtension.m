@@ -44,22 +44,23 @@ RCT_EXPORT_MODULE();
     //object variable for extension doesn't work for react-native. It must be assign to global
     //variable extensionContext. in this way, both exported method can touch extensionContext
     extensionContext = self.extensionContext;
-
-    if (sharedBridge == nil) {
-        NSFileManager *fileManager = NSFileManager.defaultManager;
-        NSURL *updatesDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.org.name.finupwhite"] URLByAppendingPathComponent:@".expo-internal"];
-        NSError *losterror;
-        NSPredicate *bPredicate = [NSPredicate predicateWithFormat:@"SELF ENDSWITH[c] 'mostrecent.bundle'"];
-        NSString *filename = [[[fileManager contentsOfDirectoryAtPath:updatesDirectory.path error:&losterror] filteredArrayUsingPredicate:bPredicate] lastObject];
-        if( filename ){
-            jsCodeLocation = [updatesDirectory URLByAppendingPathComponent:filename];
-        } else {
-            jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-        }
-        sharedBridge = [[RCTBridge alloc] initWithBundleURL:jsCodeLocation
-                                                moduleProvider:nil
-                                                launchOptions:nil];
+    if (sharedBridge != nil) {
+        [sharedBridge invalidate];
     }
+
+    NSFileManager *fileManager = NSFileManager.defaultManager;
+    NSURL *updatesDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.org.name.finupwhite"] URLByAppendingPathComponent:@".expo-internal"];
+    NSError *losterror;
+    NSPredicate *bPredicate = [NSPredicate predicateWithFormat:@"SELF ENDSWITH[c] 'mostrecent.bundle'"];
+    NSString *filename = [[[fileManager contentsOfDirectoryAtPath:updatesDirectory.path error:&losterror] filteredArrayUsingPredicate:bPredicate] lastObject];
+    if( filename ){
+        jsCodeLocation = [updatesDirectory URLByAppendingPathComponent:filename];
+    } else {
+        jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+    }
+    sharedBridge = [[RCTBridge alloc] initWithBundleURL:jsCodeLocation
+                                            moduleProvider:nil
+                                            launchOptions:nil];
 
     UIView *rootView = [self shareViewWithRCTBridge:sharedBridge];
 
@@ -136,7 +137,11 @@ RCT_REMAP_METHOD(syncUpdates,
     NSString *sortedMostRecent = [[Sf2 filteredArrayUsingPredicate:bPredicate] lastObject];
 
     NSURL *destinationDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.org.name.finupwhite"] URLByAppendingPathComponent:@".expo-internal"];
-    [fileManager removeItemAtPath:destinationDirectory.path error:nil]
+    [fileManager removeItemAtPath:destinationDirectory.path error:nil];
+
+    NSURL *assetsDirectory = [[[[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"] URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"assets"];
+    NSURL *newAssetsDirectory = [destinationDirectory URLByAppendingPathComponent:@"assets"];
+
     if (![fileManager copyItemAtPath:updatesDirectory.path toPath:destinationDirectory.path error:nil]) {
         reject(@"error", @"Could not copy files", nil);
     } else {
@@ -148,6 +153,7 @@ RCT_REMAP_METHOD(syncUpdates,
         if (![fileManager moveItemAtPath:targFile.path toPath:destFile.path error:nil]) {
             reject(@"error", @"Could not rename the most recent bundle", nil);
         } else {
+            [fileManager copyItemAtPath:assetsDirectory.path toPath:newAssetsDirectory.path error:nil];
             resolve(@{
                 @"path": destFile.path,
                 @"value": @"success"
