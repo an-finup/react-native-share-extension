@@ -136,25 +136,22 @@ RCT_REMAP_METHOD(syncUpdates,
     NSString *sortedMostRecent = [[Sf2 filteredArrayUsingPredicate:bPredicate] lastObject];
 
     NSURL *destinationDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.org.name.finupwhite"] URLByAppendingPathComponent:@".expo-internal"];
-    if (![fileManager removeItemAtPath:destinationDirectory.path error:nil]) {
-        reject(@"error", @"Could not delete old folder", nil);
+    [fileManager removeItemAtPath:destinationDirectory.path error:nil]
+    if (![fileManager copyItemAtPath:updatesDirectory.path toPath:destinationDirectory.path error:nil]) {
+        reject(@"error", @"Could not copy files", nil);
     } else {
-        if (![fileManager copyItemAtPath:updatesDirectory.path toPath:destinationDirectory.path error:nil]) {
-            reject(@"error", @"Could not copy files", nil);
-        } else {
 
-            // rename the latest bundle at the destination
-            NSString *filename = sortedMostRecent;
-            NSURL *targFile = [destinationDirectory URLByAppendingPathComponent:filename];
-            NSURL *destFile = [destinationDirectory URLByAppendingPathComponent:@"mostrecent.bundle"];
-            if (![fileManager moveItemAtPath:targFile.path toPath:destFile.path error:nil]) {
-                reject(@"error", @"Could not rename the most recent bundle", nil);
-            } else {
-                resolve(@{
-                    @"path": destFile.path,
-                    @"value": @"success"
-                    });
-            }
+        // rename the latest bundle at the destination
+        NSString *filename = sortedMostRecent;
+        NSURL *targFile = [destinationDirectory URLByAppendingPathComponent:filename];
+        NSURL *destFile = [destinationDirectory URLByAppendingPathComponent:@"mostrecent.bundle"];
+        if (![fileManager moveItemAtPath:targFile.path toPath:destFile.path error:nil]) {
+            reject(@"error", @"Could not rename the most recent bundle", nil);
+        } else {
+            resolve(@{
+                @"path": destFile.path,
+                @"value": @"success"
+                });
         }
     }
 }
