@@ -56,7 +56,7 @@ RCT_EXPORT_MODULE();
     if( filename ){
         jsCodeLocation = [updatesDirectory URLByAppendingPathComponent:filename];
     } else {
-        jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+        jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
     }
     sharedBridge = [[RCTBridge alloc] initWithBundleURL:jsCodeLocation
                                             moduleProvider:nil
