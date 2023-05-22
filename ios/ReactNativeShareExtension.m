@@ -49,7 +49,7 @@ RCT_EXPORT_MODULE();
     }
 
     NSFileManager *fileManager = NSFileManager.defaultManager;
-    NSURL *updatesDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.org.name.finupwhite"] URLByAppendingPathComponent:@".expo-internal"];
+    NSURL *updatesDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.com.blackfort.blackfortp"] URLByAppendingPathComponent:@".expo-internal"];
     NSError *losterror;
     NSPredicate *bPredicate = [NSPredicate predicateWithFormat:@"SELF ENDSWITH[c] 'mostrecent.bundle'"];
     NSString *filename = [[[fileManager contentsOfDirectoryAtPath:updatesDirectory.path error:&losterror] filteredArrayUsingPredicate:bPredicate] lastObject];
@@ -136,7 +136,7 @@ RCT_REMAP_METHOD(syncUpdates,
     NSPredicate *bPredicate = [NSPredicate predicateWithFormat:@"SELF ENDSWITH[c] '.bundle'"];
     NSString *sortedMostRecent = [[Sf2 filteredArrayUsingPredicate:bPredicate] lastObject];
 
-    NSURL *destinationDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.org.name.finupwhite"] URLByAppendingPathComponent:@".expo-internal"];
+    NSURL *destinationDirectory = [[fileManager containerURLForSecurityApplicationGroupIdentifier:@"group.com.blackfort.blackfortp"] URLByAppendingPathComponent:@".expo-internal"];
     [fileManager removeItemAtPath:destinationDirectory.path error:nil];
 
     NSURL *assetsDirectory = [[[[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"] URLByDeletingLastPathComponent] URLByAppendingPathComponent:@"assets"];
